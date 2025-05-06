@@ -28,10 +28,14 @@ public class OptionsManager {
 			log.info("===Running in HeadLess Mode===");
 			co.addArguments("--headless");
 		}
+		
 		if(Boolean.parseBoolean(prop.getProperty("incognito"))) {
 			//System.out.println("===Running in Incognito Mode===");
 			log.info("===Running in Incognito Mode===");
 			co.addArguments("--incognito");
+		}
+		if (Boolean.parseBoolean(prop.getProperty("remote"))) {
+			co.setCapability("browserName", "chrome");
 		}
 		return co;
 	}
@@ -48,6 +52,9 @@ public class OptionsManager {
 			log.info("===Running in Incognito Mode===");
 			co.addArguments("--incognito");
 		}
+		if (Boolean.parseBoolean(prop.getProperty("remote"))) {
+			fo.setCapability("browserName", "firefox");
+		}
 		return fo;
 	}
 	
@@ -62,6 +69,9 @@ public class OptionsManager {
 			//System.out.println("===Running in Incognito Mode===");
 			log.info("===Running in Incognito Mode===");
 			co.addArguments("--inPrivate");
+		}
+		if (Boolean.parseBoolean(prop.getProperty("remote"))) {
+			eo.setCapability("browserName", "edge");
 		}
 		return eo;
 	}

@@ -1,10 +1,11 @@
 package com.qa.opencart.factory;
 
 import java.io.File;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.log4j.LogManager;
@@ -16,6 +17,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.io.FileHandler;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
 import com.qa.opencart.constants.AppConstants;
@@ -44,21 +46,45 @@ public class DriverFactory {
 		highlight=prop.getProperty("highlight");
 		
 		optionsManager=new OptionsManager(prop);
+		
+		boolean remoteExecution=Boolean.parseBoolean(prop.getProperty("remote"));
+		
+		
+		
+		
+		
 		switch (browserName.trim().toLowerCase()) {
 		case "chrome":
+			
+			if(remoteExecution) {
+				initRemoteDriver("chrome");
+			}
+			else {
 			tlDriver.set(new ChromeDriver(optionsManager.getChromeOptions()));
+			}
 			//driver=new ChromeDriver(optionsManager.getChromeOptions());
 			break;
 		case "firefox":
+			if(remoteExecution) {
+				initRemoteDriver("firefox");
+			}
+			else {
 			tlDriver.set(new FirefoxDriver(optionsManager.getFirefoxOptions()));
+			}
 			//driver=new FirefoxDriver(optionsManager.getFirefoxOptions());
 			break;
 		case "safari":
+			
 			tlDriver.set(new SafariDriver());
 			//driver=new SafariDriver();
 			break;
 		case "edge":
+			if(remoteExecution) {
+				initRemoteDriver("safari");
+			}
+			else {
 			tlDriver.set(new EdgeDriver(optionsManager.getEdgeOptions()));
+			}
 			//driver=new EdgeDriver(optionsManager.getEdgeOptions());
 			break;
 
@@ -75,6 +101,33 @@ public class DriverFactory {
 	}
 	
 	
+	private void initRemoteDriver(String browserName) {
+		System.out.println("running tests on grid: " +browserName );
+		
+		try {
+		switch (browserName.trim().toLowerCase()) {
+		case "chrome":
+			tlDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")), optionsManager.getChromeOptions()));
+			break;
+		case "firefox":
+			tlDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")), optionsManager.getFirefoxOptions()));
+			break;
+		case "edge":
+			tlDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")), optionsManager.getEdgeOptions()));
+			break;
+
+		default:
+			System.out.println("browser is not supported on the grid :" +browserName);
+			break;
+		}
+		}catch(MalformedURLException e) {
+			e.printStackTrace();
+		}
+		
+		
+	}
+
+
 	public static WebDriver getDriver() {
 		return tlDriver.get();
 	}
